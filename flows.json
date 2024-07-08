@@ -1,0 +1,1206 @@
+[
+    {
+        "id": "1f5b8f02224952c8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2d4866f70cfb6557",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "command": "python3 hx-start.py",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "hx-start.py",
+        "x": 350,
+        "y": 140,
+        "wires": [
+            [
+                "3bbebc4d7434751f",
+                "7bd9a5ba2fe05161"
+            ],
+            [],
+            []
+        ],
+        "outputLabels": [
+            "data",
+            "error",
+            "exit"
+        ],
+        "icon": "node-red-dashboard/ui_gauge.png",
+        "info": "File-paths originate from user's HOME folder, i.e. \"~/\" or \"/home/pi/\"\r\nRe-deploying flow seems to kill process (good!)."
+    },
+    {
+        "id": "0b90a2647716d4be",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "command": "sudo shutdown -h now",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Shut down RPi",
+        "x": 340,
+        "y": 840,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "node-red/rpi.svg"
+    },
+    {
+        "id": "45d0e1f4fdf64310",
+        "type": "inject",
+        "z": "1f5b8f02224952c8",
+        "name": "Startup",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 120,
+        "y": 100,
+        "wires": [
+            [
+                "8e8dcf8e89cf8765"
+            ]
+        ]
+    },
+    {
+        "id": "1357fff11c9efa33",
+        "type": "rbe",
+        "z": "1f5b8f02224952c8",
+        "name": "Block X% deviation",
+        "func": "narrowband",
+        "gap": "10%",
+        "start": "",
+        "inout": "out",
+        "septopics": false,
+        "property": "payload",
+        "topi": "topic",
+        "x": 610,
+        "y": 160,
+        "wires": [
+            [
+                "7794b3ff15149ff1",
+                "7dcf990e19ca002d",
+                "cb3e60830e378c41",
+                "f1528a08c7bf9f7e"
+            ]
+        ]
+    },
+    {
+        "id": "bea087fab1b5c968",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "Reset variables",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "1278000",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "tare",
+                "pt": "flow",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "gr_to_hx",
+                "pt": "flow",
+                "to": "1971",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "gr_target",
+                "pt": "flow",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "target_achieved",
+                "pt": "flow",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 100,
+        "wires": [
+            [
+                "3bbebc4d7434751f"
+            ]
+        ],
+        "info": "Large deviations in payload will be blocked downstream, so \r\nmake sure the _first_ msg contains a number close to the real\r\ninput from your HX711."
+    },
+    {
+        "id": "3bbebc4d7434751f",
+        "type": "function",
+        "z": "1f5b8f02224952c8",
+        "name": "Parse to INT",
+        "func": "//** Parse msg.payload to INT. Ignore payloads that are not numbers. */\nvar hxdata = parseInt(msg.payload) || 'NaN'\nif (isNaN(hxdata)) {\n    //node.warn('Input was not an int: ' + msg.payload)\n    return null //Block msg.\n} else {\n    msg.payload = hxdata //Set INT\n    return msg\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 120,
+        "wires": [
+            [
+                "1357fff11c9efa33"
+            ]
+        ]
+    },
+    {
+        "id": "7a82b7866caae8cf",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "command": "pkill -f hx-start.py",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "1",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Kill hx-start.py",
+        "x": 340,
+        "y": 780,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "node-red-dashboard/ui_gauge.png"
+    },
+    {
+        "id": "7794b3ff15149ff1",
+        "type": "smooth",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "property": "payload",
+        "action": "mean",
+        "count": "10",
+        "round": "0",
+        "mult": "single",
+        "reduce": false,
+        "x": 800,
+        "y": 100,
+        "wires": [
+            [
+                "9392a5245cfd2312"
+            ]
+        ]
+    },
+    {
+        "id": "9392a5245cfd2312",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "Set flow.mean",
+        "rules": [
+            {
+                "t": "set",
+                "p": "mean",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "83fdbb3d3f4a5468",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "1: Tare",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 110,
+        "y": 480,
+        "wires": [
+            [
+                "fde5e1803e1d263a",
+                "b4a100eefe91612a"
+            ]
+        ]
+    },
+    {
+        "id": "bd43d766d46da606",
+        "type": "inject",
+        "z": "1f5b8f02224952c8",
+        "name": "Delayed",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 120,
+        "y": 440,
+        "wires": [
+            [
+                "83fdbb3d3f4a5468"
+            ]
+        ]
+    },
+    {
+        "id": "fde5e1803e1d263a",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "Set tare to flow.meanest",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tare",
+                "pt": "flow",
+                "to": "meanest",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0074a15ad8ca07a2",
+        "type": "ui_gauge",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "",
+        "label": "Target: {{msg.gr_target}}gr",
+        "format": "{{value| number:2}}gr",
+        "min": 0,
+        "max": "75",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "30",
+        "seg2": "50",
+        "diff": false,
+        "className": "",
+        "x": 710,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "485f977085609e1d",
+        "type": "function",
+        "z": "1f5b8f02224952c8",
+        "name": "Feed gauge",
+        "func": "//** Subtract tare and divide by hx_to_gr for conversion. */\nmsg.payload = (flow.get('meanest') - flow.get('tare')) / flow.get('gr_to_hx')\nmsg.gr_target = flow.get('gr_target')\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 300,
+        "wires": [
+            [
+                "0074a15ad8ca07a2"
+            ]
+        ]
+    },
+    {
+        "id": "6044ef562bf24ea7",
+        "type": "ui_form",
+        "z": "1f5b8f02224952c8",
+        "name": "2: Calibration",
+        "label": "",
+        "group": "6090dc62721c22a4",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "options": [
+            {
+                "label": "Enter known weight in grains",
+                "value": "grains",
+                "type": "number",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "grains": ""
+        },
+        "payload": "",
+        "submit": "2: Calibrate",
+        "cancel": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": false,
+        "className": "",
+        "x": 130,
+        "y": 520,
+        "wires": [
+            [
+                "868124cf807ad947"
+            ]
+        ]
+    },
+    {
+        "id": "868124cf807ad947",
+        "type": "function",
+        "z": "1f5b8f02224952c8",
+        "name": "Calculate gr_to_hx",
+        "func": "/**Get known grain weight from GUI. \n * Calculate how many HX points there are to one grain. */\n\nvar gr_cal = msg.payload.grains //Input from GUI form\nvar hx_tare = flow.get('tare')\nvar hx_cal = flow.get('meanest')\nvar gr_to_hx = (hx_cal - hx_tare) / gr_cal\nflow.set('gr_to_hx', gr_to_hx)\n\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c75baddeb10d8843",
+        "type": "ui_text",
+        "z": "1f5b8f02224952c8",
+        "group": "6090dc62721c22a4",
+        "order": 7,
+        "width": "2",
+        "height": "1",
+        "name": "",
+        "label": "gr_to_hx",
+        "format": "{{msg.payload | number:2}}",
+        "layout": "col-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 560,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "f4be1066f341339a",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "flow.gr_to_hx",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "gr_to_hx",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 340,
+        "wires": [
+            [
+                "c75baddeb10d8843"
+            ]
+        ]
+    },
+    {
+        "id": "8e8dcf8e89cf8765",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "(clean restart)",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "2d4866f70cfb6557",
+                "bea087fab1b5c968",
+                "feb0f98636e2cdec"
+            ]
+        ]
+    },
+    {
+        "id": "d33973c6f39e387e",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 11,
+        "width": "3",
+        "height": "1",
+        "passthru": true,
+        "label": "Stop HX",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "orange",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 120,
+        "y": 780,
+        "wires": [
+            [
+                "7a82b7866caae8cf"
+            ]
+        ]
+    },
+    {
+        "id": "47a5f044f4b1ce93",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 14,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "Shut down RPi",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "red",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 140,
+        "y": 840,
+        "wires": [
+            [
+                "0b90a2647716d4be",
+                "7a82b7866caae8cf",
+                "90b85b3f79477376"
+            ]
+        ]
+    },
+    {
+        "id": "7bd9a5ba2fe05161",
+        "type": "debug",
+        "z": "1f5b8f02224952c8",
+        "name": "HX raw",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "ea144929c898499f",
+        "type": "file",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "filename": "/home/pi/30s-stats.txt",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 540,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "396c18c362a6a184",
+        "type": "inject",
+        "z": "1f5b8f02224952c8",
+        "d": true,
+        "name": "Repeat stats",
+        "props": [
+            {
+                "p": "timestamp",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "10",
+        "topic": "",
+        "x": 140,
+        "y": 940,
+        "wires": [
+            [
+                "77e4c7e7bb463f60"
+            ]
+        ]
+    },
+    {
+        "id": "77e4c7e7bb463f60",
+        "type": "function",
+        "z": "1f5b8f02224952c8",
+        "name": "Stats to CSV",
+        "func": "/** Log timestamp and weight as CSV.*/\nmsg.payload = msg.timestamp + ',' + (flow.get('meaner') / flow.get('gr_to_hx'))\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 940,
+        "wires": [
+            [
+                "ea144929c898499f"
+            ]
+        ]
+    },
+    {
+        "id": "feb0f98636e2cdec",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "command": "gpio -g mode 18 pwm && gpio -g pwm 18 0",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "1",
+        "winHide": false,
+        "oldrc": false,
+        "name": "PWM: on & 0",
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "node-red/serial.svg"
+    },
+    {
+        "id": "1b2ae861799a655b",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "command": "gpio -g pwm 18 ",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "0.5",
+        "winHide": false,
+        "oldrc": false,
+        "name": "PWM duty-cycle",
+        "x": 620,
+        "y": 480,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "node-red/serial.svg"
+    },
+    {
+        "id": "faa791b01427e9aa",
+        "type": "inject",
+        "z": "1f5b8f02224952c8",
+        "name": "Refresh GUI",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "0.5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 140,
+        "y": 300,
+        "wires": [
+            [
+                "485f977085609e1d",
+                "f4be1066f341339a"
+            ]
+        ]
+    },
+    {
+        "id": "7dcf990e19ca002d",
+        "type": "counter",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "init": "0",
+        "step": "1",
+        "lower": "",
+        "upper": "",
+        "mode": "increment",
+        "outputs": "1",
+        "x": 800,
+        "y": 220,
+        "wires": [
+            [
+                "0866c6a2ff553069"
+            ]
+        ]
+    },
+    {
+        "id": "0866c6a2ff553069",
+        "type": "ui_text",
+        "z": "1f5b8f02224952c8",
+        "group": "6090dc62721c22a4",
+        "order": 9,
+        "width": "2",
+        "height": "1",
+        "name": "",
+        "label": "#HX OK",
+        "format": "{{msg.count}}",
+        "layout": "col-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 860,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "6a7497b0d6a71e16",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "d": true,
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 13,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Save & leave stats",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 150,
+        "y": 980,
+        "wires": [
+            [
+                "4722e25f368365ba"
+            ]
+        ]
+    },
+    {
+        "id": "4722e25f368365ba",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "command": "mv /home/pi/30s-stats.txt \"/home/pi/30s-stats_to_$(date +%Y-%m-%d_%H.%M.%S).txt\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "1",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Save and leave 30s-stats.txt",
+        "x": 560,
+        "y": 980,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "font-awesome/fa-floppy-o"
+    },
+    {
+        "id": "cb3e60830e378c41",
+        "type": "smooth",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "property": "payload",
+        "action": "mean",
+        "count": "75",
+        "round": "0",
+        "mult": "single",
+        "reduce": false,
+        "x": 800,
+        "y": 180,
+        "wires": [
+            [
+                "be660b720dd1ac70"
+            ]
+        ]
+    },
+    {
+        "id": "be660b720dd1ac70",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "Set flow.meanest",
+        "rules": [
+            {
+                "t": "set",
+                "p": "meanest",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 970,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f1528a08c7bf9f7e",
+        "type": "smooth",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "property": "payload",
+        "action": "mean",
+        "count": "35",
+        "round": "0",
+        "mult": "single",
+        "reduce": false,
+        "x": 800,
+        "y": 140,
+        "wires": [
+            [
+                "48c8805799ae4993"
+            ]
+        ]
+    },
+    {
+        "id": "48c8805799ae4993",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "Set flow.meaner",
+        "rules": [
+            {
+                "t": "set",
+                "p": "meaner",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9839c85ab3a6560c",
+        "type": "ui_form",
+        "z": "1f5b8f02224952c8",
+        "name": "3: Target",
+        "label": "",
+        "group": "6090dc62721c22a4",
+        "order": 5,
+        "width": "0",
+        "height": "0",
+        "options": [
+            {
+                "label": "Enter target weight in grains",
+                "value": "grains",
+                "type": "number",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "grains": ""
+        },
+        "payload": "",
+        "submit": "3: Set target",
+        "cancel": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": false,
+        "className": "",
+        "x": 120,
+        "y": 560,
+        "wires": [
+            [
+                "addaec2186301c80"
+            ]
+        ]
+    },
+    {
+        "id": "addaec2186301c80",
+        "type": "function",
+        "z": "1f5b8f02224952c8",
+        "name": "Set gr target",
+        "func": "/**Get target weight in grains from GUI. \n * Set in flow variable.*/\n\nflow.set('gr_target', msg.payload.grains)\n\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7e5823939716bd3c",
+        "type": "debug",
+        "z": "1f5b8f02224952c8",
+        "name": "PWM command",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "9f2a8ea0aab6f2f3",
+        "type": "inject",
+        "z": "1f5b8f02224952c8",
+        "d": true,
+        "name": "Trigger",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "1.0",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 110,
+        "y": 700,
+        "wires": [
+            [
+                "bbdd495271461285"
+            ]
+        ]
+    },
+    {
+        "id": "d69aafc3beb0acf8",
+        "type": "exec",
+        "z": "1f5b8f02224952c8",
+        "d": true,
+        "command": "gpio -g pwm 18 0 && gpio -g mode 18 off",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "1",
+        "winHide": false,
+        "oldrc": false,
+        "name": "PWM: off & 0",
+        "x": 570,
+        "y": 740,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "node-red/serial.svg"
+    },
+    {
+        "id": "bbdd495271461285",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 12,
+        "width": "3",
+        "height": "1",
+        "passthru": true,
+        "label": "Stop PWM",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "orange",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 130,
+        "y": 740,
+        "wires": [
+            [
+                "90b85b3f79477376"
+            ]
+        ]
+    },
+    {
+        "id": "b4a100eefe91612a",
+        "type": "function",
+        "z": "1f5b8f02224952c8",
+        "name": "Weight in. PWM out",
+        "func": "//** Send different PWM duty cycle depending on weight. */\nwhile(true){\n    var gr_to_hx = flow.get('gr_to_hx')\n    var tare = flow.get('tare')\n    var hx_target = flow.get('gr_target') * gr_to_hx\n    var hx_mean = flow.get('mean') - tare\n    var hx_meaner = flow.get('meaner') - tare\n    var hx_meanest = flow.get('meanest') - tare\n\n    if (flow.get('gr_target') <= 0) { //node.warn('Target not set.')\n        node.send({ payload: 0 })\n    }\n    else if (flow.get('target_achieved')) { //node.warn('Target achieved earlier.')\n        node.send({ payload: 0 })\n    }\n    else if (hx_mean >= hx_target) {\n        node.warn('Target ' + hx_target + ' achieved just now, at ' + hx_mean)\n        node.send({ payload: 0 })\n        flow.set('target_achieved', true)\n    }\n    //**High speed while margin to hx_mean, due to latency. */\n    else if ((hx_target - hx_mean) / gr_to_hx >= 10.5) {\n        //node.warn('Level: A. Margin: ' + (hx_target - hx_mean) / gr_to_hx + 'gr. Speed: full.')\n        node.send({ payload: 650 }) //PWM 100% is around 800\n    }\n    //**Low speed while margin to hx_meanER. */\n    //else if ((hx_target - hx_meaner) / gr_to_hx >= 9.9) {\n    //    node.warn('Level: B. Margin: ' + (hx_target - hx_meaner) / gr_to_hx + 'gr. Speed: low.')\n    //    node.send({ payload: 200 }) //PWM min\n    //}\n    //**Intermittant DC while target is X.Ygr off. */\n    else {\n        node.warn('Level: C. Margin: ' + (hx_target - hx_mean) / gr_to_hx + 'gr. Speed: intermittant')\n        node.send({ payload: 325 })\n        await new Promise(r => setTimeout(r, 150))\n        node.send({ payload: 0 })\n        await new Promise(r => setTimeout(r, 250))\n    }\n    await new Promise(r => setTimeout(r, 100)) //Wait and repeat milliseconds eternally\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 480,
+        "wires": [
+            [
+                "7e5823939716bd3c",
+                "f78879874934a02d",
+                "1b2ae861799a655b"
+            ]
+        ]
+    },
+    {
+        "id": "63718f2de51c084a",
+        "type": "ui_button",
+        "z": "1f5b8f02224952c8",
+        "name": "",
+        "group": "6090dc62721c22a4",
+        "order": 6,
+        "width": "6",
+        "height": "1",
+        "passthru": true,
+        "label": "4: Tare & throw",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "green",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 140,
+        "y": 600,
+        "wires": [
+            [
+                "f9063227b59c3ae2",
+                "fde5e1803e1d263a"
+            ]
+        ]
+    },
+    {
+        "id": "f9063227b59c3ae2",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "target_achieved: False",
+        "rules": [
+            {
+                "t": "set",
+                "p": "target_achieved",
+                "pt": "flow",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "90b85b3f79477376",
+        "type": "change",
+        "z": "1f5b8f02224952c8",
+        "name": "target_achieved: True",
+        "rules": [
+            {
+                "t": "set",
+                "p": "target_achieved",
+                "pt": "flow",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 740,
+        "wires": [
+            [
+                "d69aafc3beb0acf8"
+            ]
+        ]
+    },
+    {
+        "id": "f78879874934a02d",
+        "type": "ui_text",
+        "z": "1f5b8f02224952c8",
+        "group": "6090dc62721c22a4",
+        "order": 7,
+        "width": "2",
+        "height": "1",
+        "name": "",
+        "label": "PWM",
+        "format": "{{msg.payload | number:2}}",
+        "layout": "col-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 710,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "f382f330e65578a7",
+        "type": "inject",
+        "z": "1f5b8f02224952c8",
+        "d": true,
+        "name": "Trigger",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "1.0",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "feb0f98636e2cdec"
+            ]
+        ]
+    },
+    {
+        "id": "6090dc62721c22a4",
+        "type": "ui_group",
+        "name": "Group1:1",
+        "tab": "e52d8baccb5dc544",
+        "order": 1,
+        "disp": false,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e52d8baccb5dc544",
+        "type": "ui_tab",
+        "name": "Tab1",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
