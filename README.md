@@ -164,6 +164,7 @@ Now that Node-RED is installed, it will be used to handle the flow of HX711 inpu
 1. Browse to the Node-RED GUI at http://192.168.0.66/ui, from PC or smartphone.
 1. Tare and Calibrate just like a normal digital powder scale.
 1. Set target weight and Throw.
+
 ![Node-RED user](media/Web-GUI_user.jpg)
 
 The above will probably _not_ work right out of the box. 
