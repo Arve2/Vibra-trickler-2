@@ -11,6 +11,9 @@ The Vibra-trickler 2 is an affordable DIY auto-trickler with a mobile/web GUI fo
 ## Video on operations:
 <a href="https://youtu.be/tTNcfGOGy2k"><img src="https://img.youtube.com/vi/tTNcfGOGy2k/sddefault.jpg" width="400" ></a>
 
+## The kit:
+![Overview](media/Overview.jpg)
+
 ## Past and (no) planned development
 This project is an improvement on my old [Vibra-trickler 1](https://www.youtube.com/watch?v=v3MtZg-lgy8) project. It's main feature was turning any balance scale into an auto-trickler. It's main _drawbacks_ were
 1. having to trickle slooowly due to physical latency of the scale,
@@ -24,7 +27,7 @@ I thought I was the only person foolish enough to combine gunpowder and electron
 # Bill of material
 - [RPi](https://www.electrokit.com/raspberry-pi-zero-w-board)
 - [HX711](https://www.ebay.com/itm/295617541450)
-- [load cell](https://www.aliexpress.com/item/32736635992.html)
+- [load cell](https://www.aliexpress.com/item/32736635992.html) - the smaller range, the more sensitive!
 - 78L05
 - LM2596 or similar
 - Small DC vibrator motor
@@ -161,6 +164,7 @@ Now that Node-RED is installed, it will be used to handle the flow of HX711 inpu
 1. Browse to the Node-RED GUI at http://192.168.0.66/ui, from PC or smartphone.
 1. Tare and Calibrate just like a normal digital powder scale.
 1. Set target weight and Throw.
+![Node-RED user](media/Web-GUI_user.jpg)
 
 The above will probably _not_ work right out of the box. 
 - If the powder flow during first phase is too fast, the target weight will be overshot before the vibrator has time to slow down from max speed. Edit the node `Weight in. PWM out` >  line 22 > `10.5` grains margin to a higher margin.
@@ -170,6 +174,8 @@ The above will probably _not_ work right out of the box.
 
 # Hardware design and considerations
 **@ToDo:**
-- Powder pan / stirrup
+- Powder pan / stirrup with pictures
 - 3D prints
-- Accuracy
+- Accuracy improvements
+- Powder hopper, vibrations, feeding tube, holes, angle
+- Details/description of flow
