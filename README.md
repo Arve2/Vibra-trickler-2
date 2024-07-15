@@ -24,16 +24,25 @@ As far as my personal interest goes, the project is "done". All the drawings, ci
 # Disclaimer
 I thought I was the only person foolish enough to combine gunpowder and electronics. Now you have read this far, so I hope you know what you are doing. Use everything described below is at your own risk. Proceed with caution! 
 
-# Bill of material
-- [RPi](https://www.electrokit.com/raspberry-pi-zero-w-board)
-- [HX711](https://www.ebay.com/itm/295617541450)
-- [load cell](https://www.aliexpress.com/item/32736635992.html) - the smaller range, the more sensitive!
-- 78L05
-- LM2596 or similar
-- Small DC vibrator motor
+# Bill of materials
 - a known weight
 - powder hopper, preferrably with baffle for consistant flow
-- **@ToDo:** More
+- [RPi](https://www.electrokit.com/en/raspberry-pi-zero-w-board)
+- [HX711](https://www.ebay.com/itm/295617541450)
+- [load cell](https://www.aliexpress.com/item/32736635992.html) - the smaller the range, the more accurate!
+- Power supply. _About 10...24V, so 12V should be easily scavenged._
+- [78L05](https://www.electrokit.com/en/78l05-to-92-spanningsregulator-5v-0.1a) or similar 5V linear voltage regulator
+- [LM2596](https://www.electrokit.com/en/dc-dc-omvandlare-step-down-1.23-30v-1.5a) or similar high current voltage regulator
+- Small [DC vibrator motor](https://www.electrokit.com/en/vibrator)
+- [Solderless breadboard](https://www.electrokit.com/en/kopplingsdack-840-anslutningar) or [Breadboard pattern PCB](https://www.electrokit.com/en/experimentkort-breadboard-pcb-840-hal)
+- 2 x [100mA PTC](https://www.electrokit.com/en/ptc-sakring-60v-0.1a-aterstallningsbar) fuse (for convenience)
+- [350...500mA glass fuse](https://www.electrokit.com/en/fast/) or similar + holder (for lowest voltage drop)
+- [BC547C](https://www.electrokit.com/en/bc547c-to-92-npn-45v-100ma)
+- Any [1NXXXX diode](https://www.electrokit.com/en/silicon/)
+- [220uF capacitor](https://www.electrokit.com/en/el.lyt-220uf-25v-85c-10x16mm-bipolar)
+- [100nF capacitor](https://www.electrokit.com/en/r82-100nf-100v-55mm)
+- [2,2kohm resistor](https://www.electrokit.com/en/motstand-metallfilm-0.6w-12.2kohm-2k2)
+- Optional: [push button](https://www.electrokit.com/en/tryckknapp-pcb-6x6x6mm-svart) for RPi safe off/on
 
 # How to...
 Below, i will 
